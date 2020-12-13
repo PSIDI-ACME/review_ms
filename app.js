@@ -10,7 +10,7 @@ app.get('/', function (req, res) {
     res.send("hello world");
 });
 
-app.use("/review", reviewRoutes);
+app.use("/reviews", reviewRoutes);
 
 app.use((req, res, next) => {
     const error = new Error("Not Found")
