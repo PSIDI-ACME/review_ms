@@ -54,7 +54,7 @@ exports.post_review = (req, res, next) => {
         Http.open("PATCH", url);
         Http.onreadystatechange = function () {
             if (this.readyState === 4) {
-                res.status(201).json({ "Status": "201", "Message": "Review created successfully" });
+                res.status(201).json({ "Status": "201", "Message": "Review created successfully", "Review": "https://reviews-psidi.herokuapp.com/reviews/" + reviewId });
             }
         }
         Http.send();
@@ -80,7 +80,7 @@ exports.update_review = (req, res, next) => {
             var response = Http.responseText;
             client
                 .query("UPDATE reviews.reviews SET status = '" + req.body.status + "', funnyfact = '" + response + "' WHERE id = " + id)
-                .then(docs => res.status(201).json({ "Status": "200", "Message": "Review updated" }))
+                .then(docs => res.status(201).json({ "Status": "200", "Message": "Review updated", "Review": "https://reviews-psidi.herokuapp.com/reviews/" + id }))
                 .catch(e => console.error(e.stack))
         }
     }
