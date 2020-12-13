@@ -6,6 +6,10 @@ const reviewRoutes = require("./api/routes/review");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+app.get('/', function (req, res) {
+    res.send("hello world");
+});
+
 app.use("/review", reviewRoutes);
 
 app.use((req, res, next) => {
