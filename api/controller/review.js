@@ -9,15 +9,15 @@ exports.get_reviews = (req, res, next) => {
     const customerId = queryObject.customerId;
     const productId = queryObject.productId;
 
-    if (customerId != undefined) {
-        client
-        .query('SELECT * FROM "Customers"."Customers" WHERE id = $1', [customerId])
-        .then(docs => res.status(200).json(docs.rows))
-        .catch(e => console.error(e.stack))
-    } else if (productId != undefined) {
+    if (productId != undefined) {
         client
         .query('SELECT * FROM "Products"."Products" WHERE "productId" = $1', [productId])
-        .then(docs => res.status(200).json(docs.rows))
+        .then(docs => res.status(200).json(docs.rows[0].Reviews))
+        .catch(e => console.error(e.stack)) 
+    } else if (customerId != undefined) {
+        client
+        .query('SELECT * FROM "Customers"."Customers" WHERE id = $1', [customerId])
+        .then(docs => res.status(200).json(docs.rows[0].reviews))
         .catch(e => console.error(e.stack))
     } else {
         client
@@ -25,7 +25,7 @@ exports.get_reviews = (req, res, next) => {
         .then(docs => res.status(200).json(docs.rows))
         .catch(e => console.error(e.stack))
     }
-    
+
 }
 
 exports.post_review = (req, res, next) => {
@@ -69,7 +69,7 @@ exports.get_review_by_ID = (req, res, next) => {
         .catch(e => console.error(e.stack))
 }
 
-exports.update_review = (req, res, next) => {
+exports.update_review_accepted = (req, res, next) => {
     const id = req.params.reviewID;
     const date = getDate().split("/");
     const url = "http://numbersapi.com/" + date[1] + "/" + date[2] + "/date";
@@ -79,7 +79,25 @@ exports.update_review = (req, res, next) => {
         if (this.readyState === 4 && this.status === 200) {
             var response = Http.responseText;
             client
-                .query("UPDATE reviews.reviews SET status = '" + req.body.status + "', funnyfact = '" + response + "' WHERE id = " + id)
+                .query("UPDATE reviews.reviews SET status = 'accepted', funnyfact = '" + response + "' WHERE id = " + id)
+                .then(docs => res.status(201).json({ "Status": "200", "Message": "Review updated", "Review": "https://reviews-psidi.herokuapp.com/reviews/" + id }))
+                .catch(e => console.error(e.stack))
+        }
+    }
+    Http.send();
+}
+
+exports.update_review_rejected = (req, res, next) => {
+    const id = req.params.reviewID;
+    const date = getDate().split("/");
+    const url = "http://numbersapi.com/" + date[1] + "/" + date[2] + "/date";
+    const Http = new XMLHttpRequest();
+    Http.open("GET", url);
+    Http.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            var response = Http.responseText;
+            client
+                .query("UPDATE reviews.reviews SET status = 'rejected', funnyfact = '" + response + "' WHERE id = " + id)
                 .then(docs => res.status(201).json({ "Status": "200", "Message": "Review updated", "Review": "https://reviews-psidi.herokuapp.com/reviews/" + id }))
                 .catch(e => console.error(e.stack))
         }

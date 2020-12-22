@@ -9,6 +9,8 @@ router.post("/", ReviewController.post_review);
 
 router.get("/:reviewID", ReviewController.get_review_by_ID);
 
-router.put("/:reviewID", ReviewController.update_review);
+router.get("/:reviewID/accepted", ReviewController.update_review_accepted);
+
+router.get("/:reviewID/rejected", ReviewController.update_review_rejected);
 
 module.exports = router;
