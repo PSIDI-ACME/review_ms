@@ -8,20 +8,21 @@ exports.get_reviews = (req, res, next) => {
     const status = queryObject.status;
     const customerId = queryObject.customerId;
     const productId = queryObject.productId;
+    const defaultStatus = "accepted";
 
     if (productId != undefined) {
         client
-        .query('SELECT * FROM "Products"."Products" WHERE "productId" = $1', [productId])
-        .then(docs => res.status(200).json(docs.rows[0].Reviews))
+        .query('SELECT * FROM reviews.reviews WHERE "objectid" = $1 AND "status" = $2', [productId, defaultStatus])
+        .then(docs => res.status(200).json(docs.rows))
         .catch(e => console.error(e.stack)) 
     } else if (customerId != undefined) {
         client
-        .query('SELECT * FROM "Customers"."Customers" WHERE id = $1', [customerId])
-        .then(docs => res.status(200).json(docs.rows[0].reviews))
+        .query('SELECT * FROM reviews.reviews WHERE "authorid" = $1 AND "status" = $2', [customerId, defaultStatus])
+        .then(docs => res.status(200).json(docs.rows))
         .catch(e => console.error(e.stack))
     } else {
         client
-        .query('SELECT * FROM "reviews"."reviews" WHERE status = $1', [status])
+        .query('SELECT * FROM reviews.reviews WHERE status = $1', [status])
         .then(docs => res.status(200).json(docs.rows))
         .catch(e => console.error(e.stack))
     }
@@ -30,13 +31,14 @@ exports.get_reviews = (req, res, next) => {
 
 exports.post_review = (req, res, next) => {
     client
-        .query('CREATE SCHEMA IF NOT EXISTS Reviews; CREATE TABLE IF NOT EXISTS Reviews.Reviews (id SERIAL PRIMARY KEY, status VARCHAR(40) NOT NULL, score integer NOT NULL, reviewDescription VARCHAR(250), publishingDate date, funnyFact VARCHAR(200));');
+        .query('CREATE SCHEMA IF NOT EXISTS "reviews"; CREATE TABLE IF NOT EXISTS "reviews"."reviews" (id SERIAL PRIMARY KEY, status VARCHAR(40) NOT NULL, score decimal NOT NULL, authorID integer NOT NULL, objectID integer NOT NULL, reviewDescription VARCHAR(250), publishingDate date, funnyFact VARCHAR(200));');
     client
-        .query("INSERT INTO reviews.reviews (status, score, reviewDescription, publishingDate, funnyFact) VALUES ('pending', '" + req.body.score + "', '" + req.body.reviewDescription + "', '" + getDate() + "', 'default') RETURNING id",)
-        .then(docs => pushUserReview(docs.rows[0].id))
+        .query("INSERT INTO reviews.reviews (status, score, authorID, objectID, reviewDescription, publishingDate, funnyFact) VALUES ('pending', '" + req.body.score + "', '" + req.body.authorID +  "', '" + req.body.objectID + "', '" + req.body.reviewDescription + "', '" + getDate() + "', 'default') RETURNING id",)
+        .then(docs => res.status(201).json({ "Status": "202", "Message": "Review sent for evaluation"}))
         .catch(e => console.error(e.stack))
 
-    function pushUserReview(reviewId) {
+    ;
+    /* function pushUserReview(reviewId) {
         const url = 'http://psidi-customers.herokuapp.com/v1/customers/' + req.body.customerId + '?review=https://reviews-psidi.herokuapp.com/reviews/' + reviewId;
         const Http = new XMLHttpRequest();
         Http.open("PUT", url);
@@ -58,14 +60,22 @@ exports.post_review = (req, res, next) => {
             }
         }
         Http.send();
-    }
+    } */
 }
 
 exports.get_review_by_ID = (req, res, next) => {
     const id = req.params.reviewID;
+    var status = "accepted"
     client
-        .query('SELECT * FROM "reviews"."reviews" WHERE id = ' + id)
-        .then(docs => res.status(200).json(docs.rows))
+        .query('SELECT * FROM reviews.reviews WHERE id = ' + id + ' AND "status" = $1', [status])
+        .then(docs => {
+            var review = docs.rows;
+            if ((!Array.isArray(review) || !review.length)) {
+                res.status(404).json({ "Status": "404", "Message": "Review not found"})
+            } else {
+                res.status(200).json({review})
+            }
+        })
         .catch(e => console.error(e.stack))
 }
 
@@ -80,7 +90,7 @@ exports.update_review_accepted = (req, res, next) => {
             var response = Http.responseText;
             client
                 .query("UPDATE reviews.reviews SET status = 'accepted', funnyfact = '" + response + "' WHERE id = " + id)
-                .then(docs => res.status(201).json({ "Status": "200", "Message": "Review updated", "Review": "https://reviews-psidi.herokuapp.com/reviews/" + id }))
+                .then(docs => res.status(201).json({ "Status": "201", "Message": "Review updated", "Review": "https://reviews-psidi.herokuapp.com/reviews/" + id }))
                 .catch(e => console.error(e.stack))
         }
     }
