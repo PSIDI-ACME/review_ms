@@ -236,7 +236,7 @@ exports.post_review = (req, res, next) => {
                     newRequest.onreadystatechange = function() {
                         if (this.readyState === 4 && this.status === 200) {
                             if (newRequest.responseText != undefined) {
-                                res.status(200).json("https://reviews-psidi.herokuapp.com/reviews/" + docs.rows[0].id)
+                                res.status(202).json("https://reviews-psidi.herokuapp.com/reviews/" + docs.rows[0].id)
                             };
                             
                         }
@@ -580,7 +580,7 @@ exports.delete_review = (req, res, next) => {
     const id = req.params.reviewID;
     client
         .query('DELETE FROM reviews.reviews WHERE id = ' + id)
-        .then(docs => res.status(201).json("https://reviews-psidi.herokuapp.com/reviews/" + id))
+        .then(docs => res.status(200).json("https://reviews-psidi.herokuapp.com/reviews/" + id))
         .catch(e => console.error(e.stack))
 
 }
