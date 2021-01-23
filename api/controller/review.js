@@ -90,7 +90,7 @@ exports.get_reviews = (req, res, next) => {
                     links_temp.reject = new Object;
                     links_temp.report = new Object;
                     links_temp.vote = new Object;
-                    links_temp.self.href = "https://reviews-psidi.herokuapp.com/reviews/" + docs.rows[i].id;
+                    links_temp.self.href = "https://reviews-psidi.herokuapp.com/reviews?productId=" + docs.rows[i].id + "&nrVotes=" + nrVotes;
                     links_temp.customer.href = "https://psidi-customers.herokuapp.com/v1/customer/" + docs.rows[i].authorid;
                     links_temp.product.href = "http://catalog-psidi.herokuapp.com/product/" + docs.rows[i].objectid;
                     links_temp.funnyfact.href = "http://numbersapi.com/" + date[1] + "/" + date[2] + "/date";
@@ -118,7 +118,11 @@ exports.get_reviews = (req, res, next) => {
         links.start = new Object;
         links.previous = new Object;
         links.customer = new Object;
-        links.self.href = "https://reviews-psidi.herokuapp.com/reviews?customerId=" + customerId;
+        if (status == undefined) {
+            links.self.href = "https://reviews-psidi.herokuapp.com/reviews?customerId=" + customerId + "?status=" + status;
+        } else {
+            links.self.href = "https://reviews-psidi.herokuapp.com/reviews?customerId=" + customerId;
+        }
         links.next.href = "https://reviews-psidi.herokuapp.com/reviews?customerId=" + customerId + "&page=2";
         links.start.href = "https://reviews-psidi.herokuapp.com/reviews?customerId=" + customerId + "&page=1";
         links.previous.href = "https://reviews-psidi.herokuapp.com/reviews?customerId=" + customerId + "&page=1";
@@ -216,7 +220,8 @@ exports.post_review = (req, res, next) => {
 
     const date = getDate().split("/");
     const url = "http://numbersapi.com/" + date[1] + "/" + date[2] + "/date";
-    const Http = new XMLHttpRequest();
+    const newRoute = "http://catalog-psidi.herokuapp.com/products/score/refresh?productId=" + req.body.productId + "&score=" + req.body.score;
+    const Http = new XMLHttpRequest(); 
     Http.open("GET", url);
     Http.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
@@ -226,8 +231,17 @@ exports.post_review = (req, res, next) => {
             client
                 .query("INSERT INTO reviews.reviews (status, score, authorid, objectid, reviewdescription, publishingdate, funnyfact, votes, reports, voteslist, reportlist) VALUES ('pending', '" + req.body.score + "', '" + req.body.customerId + "', '" + req.body.productId + "', '" + req.body.reviewDescription + "', '" + getDate() + "', '" + response + "', '0', '0', '{}', '{}') RETURNING id")
                 .then(docs => {
-                    console.log(docs.rows);
-                    res.status(202).json("https://reviews-psidi.herokuapp.com/reviews/" + docs.rows[0].id)
+                    const newRequest = new XMLHttpRequest();
+                    newRequest.open("GET", newRoute);
+                    newRequest.onreadystatechange = function() {
+                        if (this.readyState === 4 && this.status === 200) {
+                            if (newRequest.responseText != undefined) {
+                                res.status(200).json("https://reviews-psidi.herokuapp.com/reviews/" + docs.rows[0].id)
+                            };
+                            
+                        }
+                    }
+                    newRequest.send();
                 })
                 .catch(e => console.error(e.stack))
         }
@@ -296,10 +310,11 @@ exports.get_review_by_ID = (req, res, next) => {
                         "_links": links,
                         "reviewdescription": review[0].reviewdescription,
                         "publishingdate": review[0].publishingdate,
-                        "funnyfact": review[0].funnyfact,
                         "votes": review[0].votes,
                         "reports": review[0].reports,
-                        "score": review[0].score
+                        "score": review[0].score,
+                        "id": review[0].id,
+                        "status": review[0].status
                     });
                 }
             })
@@ -324,7 +339,7 @@ exports.get_review_by_ID = (req, res, next) => {
                     links.report.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/report";
                     links.vote.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/vote";
                     links.customer.href = "https://psidi-customers.herokuapp.com/v1/customers/" + review[0].authorid;
-                    links.product = "http://catalog-psidi.herokuapp.com/products/" + review[0].objectid;
+                    links.product.href = "http://catalog-psidi.herokuapp.com/products/" + review[0].objectid;
                     if ((!Array.isArray(review) || !review.length)) {
                         res.status(404).json({
                             "Message": "Review not found"
@@ -334,10 +349,11 @@ exports.get_review_by_ID = (req, res, next) => {
                             "_links": links,
                             "reviewdescription": review[0].reviewdescription,
                             "publishingdate": review[0].publishingdate,
-                            "funnyfact": review[0].funnyfact,
                             "votes": review[0].votes,
                             "reports": review[0].reports,
-                            "score": review[0].score
+                            "score": review[0].score,
+                            "id": review[0].id,
+                            "status": review[0].status
                         });
                     }
                 } else {
@@ -409,7 +425,7 @@ exports.get_pending_reviews = (req, res, next) => {
 exports.report_review = (req, res, next) => {
     const id = req.params.reviewID;
     const queryObject = url.parse(req.url, true).query;
-    const user = queryObject.user;
+    const user = queryObject.customerId;
     //const reviewURL = "http://localhost:3000/reviews/" + id + "?code=asd324";
     client
         .query('SELECT * FROM reviews.reviews WHERE id = ' + id)
@@ -418,19 +434,20 @@ exports.report_review = (req, res, next) => {
             if (!array.includes(parseInt(user))) {
                 var links = new Object;
                 links.self = new Object;
-                links.report = new Object;
                 links.customer = new Object;
-                links.vote = new Object;
                 links.product = new Object;
-                links.self.href = "https://reviews-psidi.herokuapp.com/reviews/" + id;
-                links.report.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/report";
-                links.vote.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/vote";
+                links_temp.accept = new Object;
+                links_temp.reject = new Object;
+                links.self.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/report";
+                links.accept.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/accept";
+                links.reject.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/reject";
                 links.customer.href = "https://psidi-customers.herokuapp.com/v1/customers/" + docs.rows[0].authorid;
                 links.product.href = "http://catalog-psidi.herokuapp.com/products/" + docs.rows[0].objectid;
-                var votes = docs.rows[0].votes + 1;
+                var report = docs.rows[0].reports + 1;
+                console.log(report);
                 array.push(parseInt(user));
                 client
-                    .query("UPDATE reviews.reviews SET votes = " + votes + ", reportlist = array_append(reportlist, " + parseInt(user) + ") WHERE id = " + id)
+                    .query("UPDATE reviews.reviews SET report = " + report + ", reportlist = array_append(reportlist, " + parseInt(user) + ") WHERE id = " + id)
                     .then(docs => res.status(200).json({
                         "_links": links
                     }))
@@ -496,14 +513,14 @@ exports.update_review_accepted = (req, res, next) => {
             links.customer = new Object;
             links.vote = new Object;
             links.product = new Object;
-            links.self.href = "https://reviews-psidi.herokuapp.com/reviews/" + id;
+            links.self.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/report";
             links.report.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/report";
             links.vote.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/vote";
             links.customer.href = "https://psidi-customers.herokuapp.com/v1/customers/" + docs.rows[0].authorid;
             links.product.href = "http://catalog-psidi.herokuapp.com/products/" + docs.rows[0].objectid;
             client
                 .query("UPDATE reviews.reviews SET status = 'accepted' WHERE id = " + id)
-                .then(docs => res.status(201).json({
+                .then(docs => res.status(200).json({
                     "_links": links
                 }))
                 .catch(e => console.error(e.stack))
@@ -528,7 +545,7 @@ exports.update_review_rejected = (req, res, next) => {
             links.product.href = "http://catalog-psidi.herokuapp.com/products/" + docs.rows[0].objectid;
             client
                 .query("UPDATE reviews.reviews SET status = 'rejected' WHERE id = " + id)
-                .then(docs => res.status(201).json({
+                .then(docs => res.status(200).json({
                     "_links": links
                 }))
                 .catch(e => console.error(e.stack))
