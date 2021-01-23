@@ -239,7 +239,6 @@ exports.get_review_by_ID = (req, res, next) => {
                 links.product.href = "http://catalog-psidi.herokuapp.com/products/" + review[0].objectid;
                 if ((!Array.isArray(review) || !review.length)) {
                     res.status(404).json({
-                        "Status": "404",
                         "Message": "Review not found"
                     })
                 } else {
@@ -278,7 +277,6 @@ exports.get_review_by_ID = (req, res, next) => {
                     links.product = "http://catalog-psidi.herokuapp.com/products/" + review[0].objectid;
                     if ((!Array.isArray(review) || !review.length)) {
                         res.status(404).json({
-                            "Status": "404",
                             "Message": "Review not found"
                         })
                     } else {
@@ -295,7 +293,6 @@ exports.get_review_by_ID = (req, res, next) => {
                     }
                 } else {
                     res.status(404).json({
-                        "Status": "404",
                         "Message": "Review not found"
                     })
                 }
