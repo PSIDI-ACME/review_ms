@@ -453,8 +453,8 @@ exports.vote_review = (req, res, next) => {
 exports.update_review_accepted = (req, res, next) => {
     const id = req.params.reviewID;
     const date = getDate().split("/");
-    const reviewURL = "http://localhost:3000/reviews/" + id + "?code=asd324";
-    //const reviewURL = "https://reviews-psidi.herokuapp.com/reviews/" + id + "?code=asd324";
+    //const reviewURL = "http://localhost:3000/reviews/" + id + "?code=asd324";
+    const reviewURL = "https://reviews-psidi.herokuapp.com/reviews/" + id + "?code=asd324";
     const Http = new XMLHttpRequest();
 
     Http.open("GET", reviewURL);
