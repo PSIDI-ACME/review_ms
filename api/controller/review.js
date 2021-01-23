@@ -559,6 +559,15 @@ exports.get_routes = (req, res, next) => {
     });
 }
 
+exports.delete_review = (req, res, next) => {
+    const id = req.params.reviewID;
+    client
+        .query('DELETE FROM reviews.reviews WHERE id = ' + id)
+        .then(docs => res.status(201).json("Review Deleted"))
+        .catch(e => console.error(e.stack))
+
+}
+
 function getDate() {
     var today = new Date();
     var dd = today.getDate();
