@@ -19,4 +19,6 @@ router.get("/:reviewID/report", ReviewController.report_review);
 
 router.get("/:reviewID/vote", ReviewController.vote_review);
 
+router.get("/routes/api", ReviewController.get_routes);
+
 module.exports = router;
