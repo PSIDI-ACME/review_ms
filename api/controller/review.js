@@ -563,7 +563,7 @@ exports.delete_review = (req, res, next) => {
     const id = req.params.reviewID;
     client
         .query('DELETE FROM reviews.reviews WHERE id = ' + id)
-        .then(docs => res.status(201).json("Review Deleted"))
+        .then(docs => res.status(201).json("https://reviews-psidi.herokuapp.com/reviews/" + id))
         .catch(e => console.error(e.stack))
 
 }
