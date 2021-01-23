@@ -447,11 +447,7 @@ exports.update_review_accepted = (req, res, next) => {
             links.customer = new Object;
             links.vote = new Object;
             links.product = new Object;
-            links.accept = new Object;
-            links.reject = new Object;
             links.self.href = "https://reviews-psidi.herokuapp.com/reviews/" + id;
-            links.accept.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/accepted";
-            links.reject.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/rejected";
             links.report.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/report";
             links.vote.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/vote";
             links.customer.href = "https://psidi-customers.herokuapp.com/v1/customers/" + docs.rows[0].authorid;
