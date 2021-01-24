@@ -236,12 +236,12 @@ exports.post_review = (req, res, next) => {
                     newRequest.onreadystatechange = function() {
                         if (this.readyState === 4 && this.status === 200) {
                             if (newRequest.responseText != undefined) {
-                                res.status(202).json("https://reviews-psidi.herokuapp.com/reviews/" + docs.rows[0].id)
+                                console.log("sent");
                             };
-                            
                         }
                     }
                     newRequest.send();
+                    res.status(202).json("https://reviews-psidi.herokuapp.com/reviews/" + docs.rows[0].id)
                 })
                 .catch(e => console.error(e.stack))
         }
