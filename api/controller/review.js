@@ -236,7 +236,7 @@ exports.post_review = (req, res, next) => {
                     newRequest.onreadystatechange = function() {
                         if (this.readyState === 4 && this.status === 200) {
                             if (newRequest.responseText != undefined) {
-                                res.status(202).json("https://reviews-psidi.herokuapp.com/reviews/" + docs.rows[0].id)
+                                res.status(200).json("https://reviews-psidi.herokuapp.com/reviews/" + docs.rows[0].id)
                             };
                             
                         }
@@ -436,8 +436,8 @@ exports.report_review = (req, res, next) => {
                 links.self = new Object;
                 links.customer = new Object;
                 links.product = new Object;
-                links_temp.accept = new Object;
-                links_temp.reject = new Object;
+                links.accept = new Object;
+                links.reject = new Object;
                 links.self.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/report";
                 links.accept.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/accept";
                 links.reject.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/reject";
@@ -447,7 +447,7 @@ exports.report_review = (req, res, next) => {
                 console.log(report);
                 array.push(parseInt(user));
                 client
-                    .query("UPDATE reviews.reviews SET report = " + report + ", reportlist = array_append(reportlist, " + parseInt(user) + ") WHERE id = " + id)
+                    .query("UPDATE reviews.reviews SET reports = " + report + ", reportlist = array_append(reportlist, " + parseInt(user) + ") WHERE id = " + id)
                     .then(docs => res.status(200).json({
                         "_links": links
                     }))
@@ -464,7 +464,7 @@ exports.report_review = (req, res, next) => {
 exports.vote_review = (req, res, next) => {
     const id = req.params.reviewID;
     const queryObject = url.parse(req.url, true).query;
-    const user = queryObject.user;
+    const user = queryObject.customerId;
     //const reviewURL = "http://localhost:3000/reviews/" + id + "?code=asd324";
     client
         .query('SELECT * FROM reviews.reviews WHERE id = ' + id)
@@ -477,9 +477,8 @@ exports.vote_review = (req, res, next) => {
                 links.customer = new Object;
                 links.vote = new Object;
                 links.product = new Object;
-                links.self.href = "https://reviews-psidi.herokuapp.com/reviews/" + id;
+                links.self.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/vote";;
                 links.report.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/report";
-                links.vote.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/vote";
                 links.customer.href = "https://psidi-customers.herokuapp.com/v1/customers/" + docs.rows[0].authorid;
                 links.product.href = "http://catalog-psidi.herokuapp.com/products/" + docs.rows[0].objectid;
                 var votes = docs.rows[0].votes + 1;
