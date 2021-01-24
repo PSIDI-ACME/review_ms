@@ -69,6 +69,7 @@ exports.get_reviews = (req, res, next) => {
                 })
                 .catch(e => console.error(e.stack))
         } else {
+            links.self.href = "https://reviews-psidi.herokuapp.com/reviews?productId=" + productId  + "&nrVotes=" + nrVotes;
             client
             .query('SELECT * FROM reviews.reviews WHERE "objectid" = $1 AND "status" = $2 AND "votes" = $3', [productId, defaultStatus, nrVotes])
             .then(docs => {
@@ -90,7 +91,7 @@ exports.get_reviews = (req, res, next) => {
                     links_temp.reject = new Object;
                     links_temp.report = new Object;
                     links_temp.vote = new Object;
-                    links_temp.self.href = "https://reviews-psidi.herokuapp.com/reviews?productId=" + docs.rows[i].id + "&nrVotes=" + nrVotes;
+                    links_temp.self.href = "https://reviews-psidi.herokuapp.com/reviews?productId=" + docs.rows[i].id;
                     links_temp.customer.href = "https://psidi-customers.herokuapp.com/v1/customer/" + docs.rows[i].authorid;
                     links_temp.product.href = "http://catalog-psidi.herokuapp.com/product/" + docs.rows[i].objectid;
                     links_temp.funnyfact.href = "http://numbersapi.com/" + date[1] + "/" + date[2] + "/date";
