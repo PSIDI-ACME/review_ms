@@ -388,6 +388,7 @@ exports.report_review = (req, res, next) => {
     client
         .query('SELECT * FROM reviews.reviews WHERE id = ' + id)
         .then(docs => {
+            console.log(docs.rows)
             var array = docs.rows[0].reportlist;
             if (!array.includes(parseInt(user))) {
                 var links = new Object;
@@ -416,7 +417,10 @@ exports.report_review = (req, res, next) => {
                 })
             }
         })
-        .catch(e => console.error(e.stack))
+        .catch(e => {
+            res.status(404).json("Review Not Found")
+            console.error(e.stack)
+        })
 }
 
 exports.vote_review = (req, res, next) => {
