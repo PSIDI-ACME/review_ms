@@ -438,7 +438,7 @@ exports.report_review = (req, res, next) => {
                 links.product = new Object;
                 links.accept = new Object;
                 links.reject = new Object;
-                links.self.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/report";
+                links.self.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/report?customerId=" + user;
                 links.accept.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/accept";
                 links.reject.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/reject";
                 links.customer.href = "https://psidi-customers.herokuapp.com/v1/customers/" + docs.rows[0].authorid;
@@ -475,9 +475,8 @@ exports.vote_review = (req, res, next) => {
                 links.self = new Object;
                 links.report = new Object;
                 links.customer = new Object;
-                links.vote = new Object;
                 links.product = new Object;
-                links.self.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/vote";;
+                links.self.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/vote?customerId=" + user;
                 links.report.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/report";
                 links.customer.href = "https://psidi-customers.herokuapp.com/v1/customers/" + docs.rows[0].authorid;
                 links.product.href = "http://catalog-psidi.herokuapp.com/products/" + docs.rows[0].objectid;
