@@ -9,7 +9,7 @@ exports.get_reviews = (req, res, next) => {
     const customerId = queryObject.customerId;
     const productId = queryObject.productId;
     const nrVotes = queryObject.nrVotes;
-    const defaultStatus = "accepted";
+    var defaultStatus = "accepted";
 
     const date = getDate().split("/");
     var links = new Object;
@@ -112,8 +112,9 @@ exports.get_reviews = (req, res, next) => {
         links.customer = new Object;
         if (status != undefined) {
             links.self.href = "https://reviews-psidi.herokuapp.com/reviews?status=" + status + "&customerId=" + customerId;
+            defaultStatus = status;
         } else {
-            links.self.href = "https://reviews-psidi.herokuapp.com/reviews?customerId=" + customerId;
+            links.self.href = "https://reviews-psidi.herokuapp.com/reviews?customerId=" + customerId;  
         }
         links.customer.href = "https://psidi-customers.herokuapp.com/v1/customer/" + customerId;
         client
