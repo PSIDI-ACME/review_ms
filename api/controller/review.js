@@ -248,33 +248,6 @@ exports.post_review = (req, res, next) => {
         }
     }
     Http.send();
-
-
-
-
-    /* function pushUserReview(reviewId) {
-        const url = 'http://psidi-customers.herokuapp.com/v1/customers/' + req.body.customerId + '?review=https://reviews-psidi.herokuapp.com/reviews/' + reviewId;
-        const Http = new XMLHttpRequest();
-        Http.open("PUT", url);
-        Http.onreadystatechange = function () {
-            if (this.readyState === 4) {
-                pushProductReview(reviewId);
-            }
-        }
-        Http.send();
-    }
-
-    function pushProductReview(reviewId) {
-        const url = 'http://catalog-psidi.herokuapp.com/products/' + req.body.productId + '?review=https://reviews-psidi.herokuapp.com/reviews/' + reviewId;
-        const Http = new XMLHttpRequest();
-        Http.open("PATCH", url);
-        Http.onreadystatechange = function () {
-            if (this.readyState === 4) {
-                res.status(201).json({ "Status": "201", "Message": "Review created successfully", "Review": "https://reviews-psidi.herokuapp.com/reviews/" + reviewId });
-            }
-        }
-        Http.send();
-    } */
 }
 
 exports.get_review_by_ID = (req, res, next) => {
@@ -427,7 +400,6 @@ exports.report_review = (req, res, next) => {
     const id = req.params.reviewID;
     const queryObject = url.parse(req.url, true).query;
     const user = queryObject.customerId;
-    //const reviewURL = "http://localhost:3000/reviews/" + id + "?code=asd324";
     client
         .query('SELECT * FROM reviews.reviews WHERE id = ' + id)
         .then(docs => {
@@ -466,7 +438,6 @@ exports.vote_review = (req, res, next) => {
     const id = req.params.reviewID;
     const queryObject = url.parse(req.url, true).query;
     const user = queryObject.customerId;
-    //const reviewURL = "http://localhost:3000/reviews/" + id + "?code=asd324";
     client
         .query('SELECT * FROM reviews.reviews WHERE id = ' + id)
         .then(docs => {
@@ -500,8 +471,6 @@ exports.vote_review = (req, res, next) => {
 
 exports.update_review_accepted = (req, res, next) => {
     const id = req.params.reviewID;
-    const date = getDate().split("/");
-    //const reviewURL = "http://localhost:3000/reviews/" + id + "?code=asd324";
     client
         .query('SELECT * FROM reviews.reviews WHERE id = ' + id)
         .then(docs => {
@@ -529,8 +498,6 @@ exports.update_review_accepted = (req, res, next) => {
 
 exports.update_review_rejected = (req, res, next) => {
     const id = req.params.reviewID;
-    const date = getDate().split("/");
-    //const reviewURL = "http://localhost:3000/reviews/" + id + "?code=asd324";
     client
         .query('SELECT * FROM reviews.reviews WHERE id = ' + id)
         .then(docs => {
