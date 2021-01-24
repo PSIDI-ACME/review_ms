@@ -119,7 +119,7 @@ exports.get_reviews = (req, res, next) => {
         links.previous = new Object;
         links.customer = new Object;
         if (status != undefined) {
-            links.self.href = "https://reviews-psidi.herokuapp.com/reviews?status=" + status + "?customerId=" + customerId;
+            links.self.href = "https://reviews-psidi.herokuapp.com/reviews?status=" + status + "&customerId=" + customerId;
         } else {
             links.self.href = "https://reviews-psidi.herokuapp.com/reviews?customerId=" + customerId;
         }
