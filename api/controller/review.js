@@ -545,10 +545,21 @@ exports.get_routes = (req, res, next) => {
 exports.delete_review = (req, res, next) => {
     const id = req.params.reviewID;
     client
-        .query('DELETE FROM reviews.reviews WHERE id = ' + id)
-        .then(docs => res.status(200).json("https://reviews-psidi.herokuapp.com/reviews/" + id))
+        .query('SELECT * FROM reviews.reviews WHERE id = ' + id)
+        .then(docs => {
+            if (docs.rows[0].votes == 0) {
+                client
+                .query('DELETE FROM reviews.reviews WHERE id = ' + id)
+                .then(docs => res.status(200).json("https://reviews-psidi.herokuapp.com/reviews/" + id))
+                .catch(e => console.error(e.stack))
+        
+            }
+            else {
+                res.status(403).json("Cannot withdraw review");
+            }
+        })
         .catch(e => console.error(e.stack))
-
+    
 }
 
 function getDate() {
