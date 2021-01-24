@@ -18,13 +18,7 @@ exports.get_reviews = (req, res, next) => {
 
     if (productId != undefined) {
         links.self = new Object;
-        links.next = new Object;
-        links.start = new Object;
-        links.previous = new Object;
         links.self.href = "https://reviews-psidi.herokuapp.com/reviews?productId=" + productId;
-        links.next.href = "https://reviews-psidi.herokuapp.com/reviews?productId=" + productId + "&page=2";
-        links.start.href = "https://reviews-psidi.herokuapp.com/reviews?productId=" + productId + "&page=1";
-        links.previous.href = "https://reviews-psidi.herokuapp.com/reviews?productId=" + productId + "&page=1";
         if (nrVotes == undefined) {
             client
                 .query('SELECT * FROM reviews.reviews WHERE "objectid" = $1 AND "status" = $2', [productId, defaultStatus])
@@ -115,18 +109,12 @@ exports.get_reviews = (req, res, next) => {
 
     } else if (customerId != undefined) {
         links.self = new Object;
-        links.next = new Object;
-        links.start = new Object;
-        links.previous = new Object;
         links.customer = new Object;
         if (status != undefined) {
             links.self.href = "https://reviews-psidi.herokuapp.com/reviews?status=" + status + "&customerId=" + customerId;
         } else {
             links.self.href = "https://reviews-psidi.herokuapp.com/reviews?customerId=" + customerId;
         }
-        links.next.href = "https://reviews-psidi.herokuapp.com/reviews?customerId=" + customerId + "&page=2";
-        links.start.href = "https://reviews-psidi.herokuapp.com/reviews?customerId=" + customerId + "&page=1";
-        links.previous.href = "https://reviews-psidi.herokuapp.com/reviews?customerId=" + customerId + "&page=1";
         links.customer.href = "https://psidi-customers.herokuapp.com/v1/customer/" + customerId;
         client
             .query('SELECT * FROM reviews.reviews WHERE "authorid" = $1 AND "status" = $2', [customerId, defaultStatus])
@@ -168,13 +156,7 @@ exports.get_reviews = (req, res, next) => {
             .catch(e => console.error(e.stack))
     } else {
         links.self = new Object;
-        links.next = new Object;
-        links.start = new Object;
-        links.previous = new Object;
         links.self.href = "https://reviews-psidi.herokuapp.com/reviews?status=" + status;
-        links.next.href = "https://reviews-psidi.herokuapp.com/reviews?status=" + status + "&page=2";
-        links.start.href = "https://reviews-psidi.herokuapp.com/reviews?status=" + status + "&page=1";
-        links.previous.href = "https://reviews-psidi.herokuapp.com/reviews?status=" + status + "&page=1";
         client
             .query('SELECT * FROM reviews.reviews WHERE status = $1', [status])
             .then(docs => {
@@ -355,13 +337,7 @@ exports.get_pending_reviews = (req, res, next) => {
     var links = new Object;
     var embedded = new Object;
     links.self = new Object;
-    links.next = new Object;
-    links.start = new Object;
-    links.previous = new Object;
     links.self.href = "https://reviews-psidi.herokuapp.com/reviews?status=" + status;
-    links.next.href = "https://reviews-psidi.herokuapp.com/reviews?status=" + status + "&page=2";
-    links.start.href = "https://reviews-psidi.herokuapp.com/reviews?status=" + status + "&page=1";
-    links.previous.href = "https://reviews-psidi.herokuapp.com/reviews?status=" + status + "&page=1";
     client
         .query('SELECT * FROM reviews.reviews WHERE status = $1', [status])
         .then(docs => {

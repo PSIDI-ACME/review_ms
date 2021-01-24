@@ -23,6 +23,4 @@ router.get("/:reviewID/vote", ReviewController.vote_review);
 
 router.get("/routes/api", ReviewController.get_routes);
 
-router.delete(":reviewID")
-
 module.exports = router;
