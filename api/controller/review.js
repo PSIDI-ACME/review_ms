@@ -160,6 +160,7 @@ exports.get_reviews = (req, res, next) => {
         client
             .query('SELECT * FROM reviews.reviews WHERE status = $1', [status])
             .then(docs => {
+                console.log(docs.rows);
                 var items = [];
                 var reviews = [];
                 for (i = 0; i < docs.rows.length; i++) {
@@ -403,7 +404,7 @@ exports.report_review = (req, res, next) => {
                 console.log(report);
                 array.push(parseInt(user));
                 client
-                    .query("UPDATE reviews.reviews SET reports = " + report + ", reportlist = array_append(reportlist, " + parseInt(user) + ") WHERE id = " + id)
+                    .query("UPDATE reviews.reviews SET reports = " + report + ", status = 'reported', reportlist = array_append(reportlist, " + parseInt(user) + ") WHERE id = " + id)
                     .then(docs => res.status(200).json({
                         "_links": links
                     }))
