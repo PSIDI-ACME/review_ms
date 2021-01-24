@@ -251,6 +251,7 @@ exports.post_review = (req, res, next) => {
 }
 
 exports.get_review_by_ID = (req, res, next) => {
+    const date = getDate().split("/");
     const queryObject = url.parse(req.url, true).query;
     const code = queryObject.code;
     const id = req.params.reviewID;
@@ -266,6 +267,7 @@ exports.get_review_by_ID = (req, res, next) => {
                 links.product = new Object;
                 links.accept = new Object;
                 links.reject = new Object;
+                links.funnyfact = new Object;
                 links.report = new Object;
                 links.vote = new Object;
                 links.self.href = "https://reviews-psidi.herokuapp.com/reviews/" + id;
@@ -273,6 +275,7 @@ exports.get_review_by_ID = (req, res, next) => {
                 links.reject.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/rejected";
                 links.report.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/report";
                 links.vote.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/vote";
+                links.funnyfact.href = "http://numbersapi.com/" + date[1] + "/" + date[2] + "/date";
                 links.customer.href = "https://psidi-customers.herokuapp.com/v1/customers/" + review[0].authorid;
                 links.product.href = "http://catalog-psidi.herokuapp.com/products/" + review[0].objectid;
                 if ((!Array.isArray(review) || !review.length)) {
@@ -288,7 +291,8 @@ exports.get_review_by_ID = (req, res, next) => {
                         "reports": review[0].reports,
                         "score": review[0].score,
                         "id": review[0].id,
-                        "status": review[0].status
+                        "status": review[0].status,
+                        "funnyfact": review[0].funnyfact
                     });
                 }
             })
@@ -305,6 +309,7 @@ exports.get_review_by_ID = (req, res, next) => {
                     links.product = new Object;
                     links.accept = new Object;
                     links.reject = new Object;
+                    links.funnyfact = new Object;
                     links.report = new Object;
                     links.vote = new Object;
                     links.self.href = "https://reviews-psidi.herokuapp.com/reviews/" + id;
@@ -312,6 +317,7 @@ exports.get_review_by_ID = (req, res, next) => {
                     links.reject.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/rejected";
                     links.report.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/report";
                     links.vote.href = "https://reviews-psidi.herokuapp.com/reviews/" + id + "/vote";
+                    links.funnyfact.href = "http://numbersapi.com/" + date[1] + "/" + date[2] + "/date";
                     links.customer.href = "https://psidi-customers.herokuapp.com/v1/customers/" + review[0].authorid;
                     links.product.href = "http://catalog-psidi.herokuapp.com/products/" + review[0].objectid;
                     if ((!Array.isArray(review) || !review.length)) {
@@ -327,7 +333,8 @@ exports.get_review_by_ID = (req, res, next) => {
                             "reports": review[0].reports,
                             "score": review[0].score,
                             "id": review[0].id,
-                            "status": review[0].status
+                            "status": review[0].status,
+                            "funnyfact": review[0].funnyfact
                         });
                     }
                 } else {
